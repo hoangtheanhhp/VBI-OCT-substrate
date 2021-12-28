@@ -2,26 +2,29 @@
 
 pub use pallet::*;
 
+pub enum Zodiac {
+	Aquarius,
+	Pisces,
+	Aries,
+	Taurus,
+	Gemini,
+	Cancer,
+	Leo,
+	Virgo,
+	Libra,
+	Scorpio,
+	Sagittarius,
+	Capricorn,
+}
+
 #[frame_support::pallet]
 pub mod pallet {
 	use frame_support::{dispatch::*, pallet_prelude::*};
 	use frame_system::pallet_prelude::*;
 
-	pub enum Zodiac {
-		Aquarius,
-		Pisces,
-		Aries,
-		Taurus,
-		Gemini,
-		Cancer,
-		Leo,
-		Virgo,
-		Libra,
-		Scorpio,
-		Sagittarius,
-		Capricorn,
-	}
+	use super::{Zodiac};
 
+	pub type ZodiacOf<T> = Zodiac;
 	/// Configure the pallet by specifying the parameters and types on which it depends.
 	#[pallet::config]
 	pub trait Config: frame_system::Config {
@@ -38,7 +41,7 @@ pub mod pallet {
 	#[pallet::storage]
 	#[pallet::getter(fn account_zodiac)]
 	//Account's zodiac storage
-	pub type AccountZodiac<T> = StorageMap<_, Blake2_128Concat, T::AccountId, Zodiac, ValueQuery>;
+	pub type AccountZodiac<T: Config> = StorageMap<_, Blake2_128Concat, T::AccountId, ZodiacOf<T>, ValueQuery>;
 
 
 	// Pallets use events to inform users when important changes are made.
@@ -46,7 +49,7 @@ pub mod pallet {
 	#[pallet::event]
 	#[pallet::generate_deposit(pub(super) fn deposit_event)]
 	pub enum Event<T: Config> {
-		SetZodiacSucceed(T::AccountId, Zodiac),
+		SetZodiacSucceed(T::AccountId, ZodiacOf<T>),
 	}
 
 	// Errors inform users that something went wrong.
@@ -60,9 +63,9 @@ pub mod pallet {
 		/// An example dispatchable that takes a singles value as a parameter, writes the value to
 		/// storage and emits an event. This function must be dispatched by a signed extrinsic.
 		#[pallet::weight(10_000)]
-		pub fn setZodiac(origin: OriginFor<T>, zodiac: Zodiac) -> DispatchResult {
+		pub fn setZodiac(origin: OriginFor<T>, zodiac: ZodiacOf<T>) -> DispatchResult {
 			let who = ensure_signed(origin)?;
-			if AccountZodiac::<T>::contrain_key(&account_id) {
+			if AccountZodiac::<T>::contrain_key(&who) {
 				Err(Error::<T>::ZodiacWasSet)?
 			} else {
 				AccountZodiac::<T>::insert(&who, zodiac);
