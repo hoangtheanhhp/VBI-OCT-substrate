@@ -2,29 +2,35 @@
 
 pub use pallet::*;
 
-pub enum Zodiac {
-	Aquarius,
-	Pisces,
-	Aries,
-	Taurus,
-	Gemini,
-	Cancer,
-	Leo,
-	Virgo,
-	Libra,
-	Scorpio,
-	Sagittarius,
-	Capricorn,
-}
 
 #[frame_support::pallet]
 pub mod pallet {
 	use frame_support::{dispatch::*, pallet_prelude::*};
 	use frame_system::pallet_prelude::*;
+	use scale_info::TypeInfo;
 
-	use super::{Zodiac};
+	#[derive(Clone, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo)]
+	#[scale_info(skip_type_params(T))]
+	pub enum Zodiac {
+		Aquarius,
+		Pisces,
+		Aries,
+		Taurus,
+		Gemini,
+		Cancer,
+		Leo,
+		Virgo,
+		Libra,
+		Scorpio,
+		Sagittarius,
+		Capricorn,
+	}
+	
+	impl Default for Zodiac {
+		fn default() -> Self { Zodiac::Aquarius }
+	}
+	
 
-	pub type ZodiacOf<T> = Zodiac;
 	/// Configure the pallet by specifying the parameters and types on which it depends.
 	#[pallet::config]
 	pub trait Config: frame_system::Config {
@@ -41,7 +47,7 @@ pub mod pallet {
 	#[pallet::storage]
 	#[pallet::getter(fn account_zodiac)]
 	//Account's zodiac storage
-	pub type AccountZodiac<T: Config> = StorageMap<_, Blake2_128Concat, T::AccountId, ZodiacOf<T>, ValueQuery>;
+	pub type AccountZodiac<T: Config> = StorageMap<_, Blake2_128Concat, T::AccountId, Zodiac, ValueQuery>;
 
 
 	// Pallets use events to inform users when important changes are made.
@@ -49,7 +55,7 @@ pub mod pallet {
 	#[pallet::event]
 	#[pallet::generate_deposit(pub(super) fn deposit_event)]
 	pub enum Event<T: Config> {
-		SetZodiacSucceed(T::AccountId, ZodiacOf<T>),
+		SetZodiacSucceed(T::AccountId),
 	}
 
 	// Errors inform users that something went wrong.
@@ -63,13 +69,13 @@ pub mod pallet {
 		/// An example dispatchable that takes a singles value as a parameter, writes the value to
 		/// storage and emits an event. This function must be dispatched by a signed extrinsic.
 		#[pallet::weight(10_000)]
-		pub fn setZodiac(origin: OriginFor<T>, zodiac: ZodiacOf<T>) -> DispatchResult {
+		pub fn setZodiac(origin: OriginFor<T>) -> DispatchResult {
 			let who = ensure_signed(origin)?;
-			if AccountZodiac::<T>::contrain_key(&who) {
+			if AccountZodiac::<T>::contains_key(&who) {
 				Err(Error::<T>::ZodiacWasSet)?
 			} else {
-				AccountZodiac::<T>::insert(&who, zodiac);
-				Self::deposit_event(Event::SetZodiacSucceed(&who, zodiac));
+				AccountZodiac::<T>::insert(&who, Zodiac::Aquarius);
+				Self::deposit_event(Event::<T>::SetZodiacSucceed(who));
 			}
 			// Return a successful DispatchResultWithPostInfo
 			Ok(())
