@@ -1,1 +1,4 @@
 .DS*
+.gitpod.yml
+*.lock
+target
