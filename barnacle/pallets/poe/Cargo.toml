@@ -1,0 +1,34 @@
+[features]
+default = ['std']
+runtime-benchmarks = ['frame-benchmarking/runtime-benchmarks']
+std = [
+    'codec/std',
+    'scale-info/std',
+    'frame-support/std',
+    'frame-system/std',
+    'frame-benchmarking/std',
+    'sp-std/std'
+]
+try-runtime = ['frame-support/try-runtime']
+
+[package]
+edition = '2021'
+name = 'pallet-poe'
+publish = false
+version = '0.0.1'
+[package.metadata.docs.rs]
+targets = ['x86_64-unknown-linux-gnu']
+
+
+
+[dependencies]
+sp-core = { git = 'https://github.com/paritytech/substrate.git', branch = 'polkadot-v0.9.13', default-features = false }
+sp-io = { git = 'https://github.com/paritytech/substrate.git', branch = 'polkadot-v0.9.13', default-features = false }
+sp-runtime = { git = 'https://github.com/paritytech/substrate.git', branch = 'polkadot-v0.9.13', default-features = false }
+sp-std = { git = 'https://github.com/paritytech/substrate.git', branch = 'polkadot-v0.9.13', default-features = false }
+codec = { package = 'parity-scale-codec', version = '2.0.0', default-features = false, features = ['derive'] }
+scale-info = { version = '1.0', default-features = false, features = ['derive'] }
+
+frame-benchmarking = { git = 'https://github.com/paritytech/substrate.git', branch = 'polkadot-v0.9.13', default-features = false, optional = true }
+frame-support = { git = 'https://github.com/paritytech/substrate.git', branch = 'polkadot-v0.9.13', default-features = false }
+frame-system = { git = 'https://github.com/paritytech/substrate.git', branch = 'polkadot-v0.9.13', default-features = false }
